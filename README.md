@@ -147,11 +147,12 @@ Everything lives in **`Config/Slate.xcconfig`**:
 
 ```
 DEVELOPMENT_TEAM = 4UP7AQ5437          // your Personal Team ID
-SLATE_BUNDLE_PREFIX = com.yourname.slate
+SLATE_BUNDLE_PREFIX = com.garvinchanderia.slate
 ```
 
-1. Set `SLATE_BUNDLE_PREFIX` to something unique to you, e.g. `com.janedoe.slate`. Bundle IDs are
-   global across all Apple accounts, so `com.yourname.slate` may already be taken.
+1. `SLATE_BUNDLE_PREFIX` must be unique to you (it is set to `com.garvinchanderia.slate`). Bundle IDs are
+   global across all Apple accounts: the original placeholder `com.yourname.slate` was rejected
+   because another account already owns `group.com.yourname.slate`.
 2. Check `DEVELOPMENT_TEAM`. In Xcode, open the project ▸ any target ▸ Signing & Capabilities, and
    pick "*Your Name* (Personal Team)". The 10-character ID it shows belongs here. Xcode may write
    the team into the target as well; that's harmless if it's the same value.

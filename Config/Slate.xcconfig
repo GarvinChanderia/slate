@@ -10,7 +10,7 @@
 //   SLATE_BUNDLE_PREFIX  A reverse-DNS prefix that's unique to you, e.g. com.janedoe.slate
 
 DEVELOPMENT_TEAM = 4UP7AQ5437
-SLATE_BUNDLE_PREFIX = com.yourname.slate
+SLATE_BUNDLE_PREFIX = com.garvinchanderia.slate
 
 // Derived IDs (do not edit below this line) -----------------------------------
 
