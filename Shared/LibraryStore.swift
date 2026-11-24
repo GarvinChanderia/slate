@@ -19,6 +19,11 @@ nonisolated protocol LibraryStore: Sendable {
 
     func setFavorite(_ isFavorite: Bool, for id: LibraryItem.ID) async throws
 
+    /// Deletes stored files that no item refers to (left behind by a crash mid-import or
+    /// mid-delete). Returns the number of files removed.
+    @discardableResult
+    func removeOrphanedFiles() async throws -> Int
+
     /// Location of a stored file. Callers must not assume the file exists (it may have been
     /// deleted by another process since the item list was read).
     func fileURL(for item: LibraryItem, variant: ImageVariant) -> URL

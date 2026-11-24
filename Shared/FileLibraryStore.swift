@@ -15,6 +15,8 @@ import Foundation
 actor FileLibraryStore: LibraryStore {
     nonisolated let rootURL: URL
     private var cachedItems: [LibraryItem]?
+    /// Imports whose files are being written but aren't in the index yet.
+    private var inFlightIDs: Set<UUID> = []
 
     init(rootURL: URL) {
         self.rootURL = rootURL
@@ -80,6 +82,8 @@ actor FileLibraryStore: LibraryStore {
         try checkFreeSpace(forCopying: sourceURL)
 
         let id = UUID()
+        inFlightIDs.insert(id)
+        defer { inFlightIDs.remove(id) }
         let originalURL = fileURL(for: id, fileExtension: info.fileExtension, variant: .original)
         let thumbnailURL = fileURL(for: id, fileExtension: "jpg", variant: .thumbnail)
         let widgetURL = fileURL(for: id, fileExtension: "jpg", variant: .widget)
@@ -128,11 +132,9 @@ actor FileLibraryStore: LibraryStore {
         try writeIndex(items)
     }
 
-    /// Deletes files that aren't referenced by the index (left over by a crash mid-import or
-    /// mid-delete). Returns the number of files removed.
     @discardableResult
     func removeOrphanedFiles() throws -> Int {
-        let known = Set(try items().map(\.id.uuidString))
+        let known = Set(try items().map(\.id.uuidString) + inFlightIDs.map(\.uuidString))
         var removed = 0
         for variant in ImageVariant.allCases {
             let urls = (try? FileManager.default.contentsOfDirectory(at: directoryURL(for: variant), includingPropertiesForKeys: nil)) ?? []
