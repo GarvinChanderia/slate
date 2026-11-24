@@ -1,16 +1,9 @@
-//
-//  SlateWidgetsBundle.swift
-//  SlateWidgets
-//
-//  Created by Garvin Chanderia on 24/11/26.
-//
-
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct SlateWidgetsBundle: WidgetBundle {
     var body: some Widget {
-        SlateWidgets()
+        SlideshowWidget()
     }
 }
