@@ -8,6 +8,9 @@
 //                        shows "Personal Team"; the 10-character ID appears in the
 //                        Signing & Capabilities tab once selected.
 //   SLATE_BUNDLE_PREFIX  A reverse-DNS prefix that's unique to you, e.g. com.janedoe.slate
+//
+// If you edit this file outside Xcode, Xcode may keep using the old values for
+// launching until the project is reopened.
 
 DEVELOPMENT_TEAM = 4UP7AQ5437
 SLATE_BUNDLE_PREFIX = com.garvinchanderia.slate
