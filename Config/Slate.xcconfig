@@ -1,0 +1,29 @@
+// Slate.xcconfig: the ONE place to configure signing identity and IDs.
+//
+// Before running on a device, set these two values once and don't change them
+// again. A free (Personal Team) Apple ID can register only 10 App IDs per 7 days,
+// and Slate uses 2 of them (app + widget extension) plus 1 App Group.
+//
+//   DEVELOPMENT_TEAM     Your Team ID. Xcode > Settings > Accounts > (your Apple ID)
+//                        shows "Personal Team"; the 10-character ID appears in the
+//                        Signing & Capabilities tab once selected.
+//   SLATE_BUNDLE_PREFIX  A reverse-DNS prefix that's unique to you, e.g. com.janedoe.slate
+
+DEVELOPMENT_TEAM = 4UP7AQ5437
+SLATE_BUNDLE_PREFIX = com.yourname.slate
+
+// Derived IDs (do not edit below this line) -----------------------------------
+
+SLATE_APP_BUNDLE_ID = $(SLATE_BUNDLE_PREFIX)
+SLATE_WIDGET_BUNDLE_ID = $(SLATE_BUNDLE_PREFIX).widgets
+SLATE_TESTS_BUNDLE_ID = $(SLATE_BUNDLE_PREFIX).tests
+
+// App Group shared by the app and the widget extension.
+// - iOS requires the "group." prefix (registered in the developer portal by Xcode).
+// - macOS uses the Team-ID-prefixed form: $(TeamIdentifierPrefix)<name>. For any team,
+//   $(TeamIdentifierPrefix) == "$(DEVELOPMENT_TEAM)." so it is spelled out here so that
+//   the exact same string can be written to both the entitlements and Info.plist.
+//   The app reads it back from Info.plist (key SlateAppGroupID) at runtime.
+SLATE_APP_GROUP_ID[sdk=iphoneos*] = group.$(SLATE_BUNDLE_PREFIX)
+SLATE_APP_GROUP_ID[sdk=iphonesimulator*] = group.$(SLATE_BUNDLE_PREFIX)
+SLATE_APP_GROUP_ID[sdk=macosx*] = $(DEVELOPMENT_TEAM).$(SLATE_BUNDLE_PREFIX)
