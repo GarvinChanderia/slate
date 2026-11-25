@@ -153,7 +153,7 @@ actor FileLibraryStore: LibraryStore {
     }
 
     // Dates use the default (Double) encoding: unlike ISO 8601 it round-trips exactly.
-    private static let decoder = JSONDecoder()
+    private nonisolated static let decoder = JSONDecoder()
 
     private func writeIndex(_ items: [LibraryItem]) throws(LibraryError) {
         do {

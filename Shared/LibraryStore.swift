@@ -5,28 +5,32 @@ import Foundation
 /// The UI and the widget only talk to this protocol, so a different backend (for example one
 /// that mirrors an iCloud Drive folder) can be added later without touching either.
 /// Implementations must perform file IO and image processing off the main actor.
-nonisolated protocol LibraryStore: Sendable {
+///
+/// Each requirement is marked `nonisolated` individually rather than marking the protocol itself:
+/// with `nonisolated protocol`, the Release optimiser (Xcode 27.2) wrongly reports "'nonisolated'
+/// modifier cannot be applied" on actors that conform to it.
+protocol LibraryStore: Sendable {
     /// All items, newest first.
-    func items() async throws -> [LibraryItem]
+    nonisolated func items() async throws -> [LibraryItem]
 
     /// Copies the image at `sourceURL` into the library, generating the grid thumbnail and
     /// widget derivative. The source file is never modified or referenced afterwards.
     /// - Parameter filename: Display name to record; defaults to the source's last path component.
-    func importImage(at sourceURL: URL, filename: String?) async throws -> LibraryItem
+    nonisolated func importImage(at sourceURL: URL, filename: String?) async throws -> LibraryItem
 
     /// Removes the items and every file stored for them.
-    func delete(_ ids: Set<LibraryItem.ID>) async throws
+    nonisolated func delete(_ ids: Set<LibraryItem.ID>) async throws
 
-    func setFavorite(_ isFavorite: Bool, for id: LibraryItem.ID) async throws
+    nonisolated func setFavorite(_ isFavorite: Bool, for id: LibraryItem.ID) async throws
 
     /// Deletes stored files that no item refers to (left behind by a crash mid-import or
     /// mid-delete). Returns the number of files removed.
     @discardableResult
-    func removeOrphanedFiles() async throws -> Int
+    nonisolated func removeOrphanedFiles() async throws -> Int
 
     /// Location of a stored file. Callers must not assume the file exists (it may have been
     /// deleted by another process since the item list was read).
-    func fileURL(for item: LibraryItem, variant: ImageVariant) -> URL
+    nonisolated func fileURL(for item: LibraryItem, variant: ImageVariant) -> URL
 }
 
 /// Errors surfaced to the user. Messages are written to be shown directly in an alert.
