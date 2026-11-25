@@ -210,6 +210,18 @@ and the widget shows "Open Slate to set up its library".
    of the build folder (Product ▸ Show Build Folder in Finder) into `/Applications` and launch it
    from there.
 
+### Installing the Mac app for everyday use
+
+```sh
+scripts/install-mac.sh
+```
+
+This archives a signed **Release** build, installs it as `/Applications/Slate.app`, and relaunches
+it. Run it again to ship an update; the library is kept because it lives in the App Group
+container. The script also unregisters the other `Slate.app` copies in Xcode's build folders:
+when the iPhone build (which Apple-silicon Macs can run) is registered under the same bundle ID,
+the Dock may show a blank icon. If you run Slate from Xcode afterwards, run the script again.
+
 ### The weekly re-sign limitation
 
 Free-team provisioning profiles expire after **7 days**. After that, **iOS refuses to launch the
