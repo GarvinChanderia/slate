@@ -25,7 +25,8 @@ APP="$ARCHIVE/Products/Applications/Slate.app"
 codesign --verify --deep --strict "$APP"
 
 echo "==> Installing to $DEST"
-osascript -e 'tell application id "com.garvinchanderia.slate" to quit' 2>/dev/null || true
+BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")
+osascript -e "tell application id \"$BUNDLE_ID\" to quit" 2>/dev/null || true
 sleep 1
 rm -rf "$DEST"
 ditto "$APP" "$DEST"

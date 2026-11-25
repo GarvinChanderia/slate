@@ -1,13 +1,36 @@
 # Slate
 
 A private image library for iPhone, iPad, and Mac, with home-screen, lock-screen, and desktop
-widgets that rotate through your images. Personal use; built to run with a **free Apple ID
-(Personal Team)**.
+widgets that rotate through your images. Built to run with a **free Apple ID (Personal Team)**,
+with no App Store account or paid developer program needed.
 
 - iOS 18+ / macOS 15+, Swift 6, SwiftUI, one shared codebase (platform code only behind `#if os()`)
 - Images are **copied** into Slate's App Group container. Slate never reads from or writes to the
   Photos library and never asks for Photos permission (PhotosPicker runs out of process).
-- No iCloud, CloudKit, or push notifications. The only capability is **App Groups**.
+- No accounts, analytics, network access, iCloud, or push notifications. The only capability is
+  **App Groups**.
+
+## Features
+
+- **Masonry library** that stays smooth with 1,000+ images; import from Photos, Files, or drag and drop
+- **Viewer** with swipe/arrow-key paging and pinch or double-tap zoom
+- **Slideshow** with cross-fades, shuffle, and a configurable interval
+- **Widgets** in every system size (plus the iOS Lock Screen), each with its own rotation interval,
+  order, and Fill/Fit setting
+- Full **keyboard and menu** support on Mac and iPad
+
+## Quick start
+
+1. Clone the repo and open `SlideshowApp.xcodeproj` in **Xcode 27.2** or later.
+2. Open **`Config/Slate.xcconfig`** and replace the two values with your own (details in
+   [Setting your Team and bundle ID](#setting-your-team-and-bundle-id-one-place)):
+   ```
+   DEVELOPMENT_TEAM = <your 10-character Team ID>
+   SLATE_BUNDLE_PREFIX = com.<yourname>.slate
+   ```
+3. Select the **SlideshowApp** scheme, pick a device or **My Mac**, and Run (⌘R).
+
+The tests need no signing at all: select the **SlateTests** scheme and press ⌘U.
 
 ---
 
@@ -114,15 +137,22 @@ reloaded (`WidgetCenter.shared.reloadAllTimelines()`) after every import batch a
 - **Fill** crops the image to the widget's exact aspect ratio: centred horizontally; vertically
   biased upward (to 45% of the height, or 38% on the wide medium widget) so faces and horizons
   survive. **Fit** letterboxes the image over its average colour.
-- **Timelines:** each timeline is built 30–48 entries ahead:
+- **Timelines:** each timeline is built up to 48 entries ahead:
 
-| Setting | Entries | Covers |
+| Setting | Max entries | Covers (at most) |
 |---|---|---|
 | 15 min | 48 | 12 hours |
 | 30 min | 48 | 1 day |
 | 1 hr | 48 | 2 days |
 | 3 hr | 40 | 5 days |
 | Daily | 30 | 30 days |
+
+  WidgetKit renders every entry up front and rejects a timeline whose archived renders exceed
+  roughly 10 MB ("too large timeline archive"). When that happens the widget stays on a blank
+  placeholder and the system backs off reloads for 15+ minutes. So the entry count is also capped
+  by the widget's pixel size, targeting a ~4 MB archive. On a Retina Mac that's about 37 entries
+  for Medium, 17 for Large, and 8 for Extra Large; Small keeps all 48. When a timeline runs out,
+  WidgetKit asks for the next one.
 
   Rotation slots align to the clock (on the hour, at midnight) and have absolute numbers, so a
   rebuilt timeline carries on where the old one left off. Shuffle shows every image once per cycle.
@@ -146,19 +176,26 @@ animated slideshow. Widgets can't animate between photos. For that, use the in-a
 Everything lives in **`Config/Slate.xcconfig`**:
 
 ```
-DEVELOPMENT_TEAM = 4UP7AQ5437          // your Personal Team ID
-SLATE_BUNDLE_PREFIX = com.garvinchanderia.slate
+DEVELOPMENT_TEAM = ABCDE12345          // your Team ID
+SLATE_BUNDLE_PREFIX = com.yourname.slate
 ```
 
-1. `SLATE_BUNDLE_PREFIX` must be unique to you (it is set to `com.garvinchanderia.slate`). Bundle IDs are
-   global across all Apple accounts: the original placeholder `com.yourname.slate` was rejected
-   because another account already owns `group.com.yourname.slate`.
-2. Check `DEVELOPMENT_TEAM`. In Xcode, open the project ▸ any target ▸ Signing & Capabilities, and
+The values checked into this repo are the maintainer's. **Replace both before building for a
+device**; signing with someone else's team won't work.
+
+1. `SLATE_BUNDLE_PREFIX` must be unique to you. Bundle IDs and App Group IDs are global across all
+   Apple accounts, so a common placeholder such as `com.yourname.slate` is likely already taken
+   (`group.com.yourname.slate` was, when this project started). Use something like
+   `com.<your-full-name>.slate`.
+2. Set `DEVELOPMENT_TEAM`. In Xcode, open the project ▸ any target ▸ Signing & Capabilities, and
    pick "*Your Name* (Personal Team)". The 10-character ID it shows belongs here. Xcode may write
    the team into the target as well; that's harmless if it's the same value.
 3. **Do this once, before the first device build, and then leave it alone.** Free teams can create
    only **10 App IDs per 7 days**. Slate uses 2 (`<prefix>` for the app and `<prefix>.widgets` for
    the widget) plus one App Group. Every prefix change registers new ones.
+
+If you edit the xcconfig outside Xcode, Xcode may keep using the old values until you reopen the
+project.
 
 Everything else is derived from those two values:
 
@@ -274,3 +311,22 @@ identity. Run it on "My Mac" or any simulator (⌘U).
   care about first (Slate never deletes your originals in Photos or Files).
 - **Viewer memory:** images display at up to 3072 px on the long edge, so very deep zoom on a large
   original gets soft.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. Please:
+
+- keep platform-specific code behind `#if os()` so iOS and macOS share one codebase;
+- route all storage through the `LibraryStore` protocol rather than touching paths directly;
+- add or update Swift Testing tests in `SlateTests/` for changes to `Shared/`;
+- avoid committing your own `DEVELOPMENT_TEAM` / `SLATE_BUNDLE_PREFIX` changes to
+  `Config/Slate.xcconfig` (for example, `git update-index --skip-worktree Config/Slate.xcconfig`).
+
+## License
+
+Slate is released under the [MIT License](LICENSE).
+
+The logo uses [Figtree](https://github.com/erikdkennedy/figtree), converted to outlines; Figtree
+is licensed under the SIL Open Font License (see `Design/Figtree-OFL.txt`).
